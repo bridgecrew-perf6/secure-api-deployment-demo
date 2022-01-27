@@ -4,11 +4,11 @@ parameters:
 
 variables:
   verbosity: "quiet"
-  serviceName: "dotnetfriday"
-  serviceAbbreviation: "dnfriday"
+  serviceName: "nicdemo"
+  serviceAbbreviation: "nicdemo"
   azureRegion: "Weu"
   deploymentEnvironment: ${{ parameters.deploymentEnvironment }}
   resourceGroupName: "$(serviceAbbreviation)-${{ parameters.deploymentEnvironment }}-$(azureRegion)"
   subscriptionId: "${{ parameters.subscriptionId }}"
   deployTimeSubscription: "DeployTimeKeyVault"
-  deployTimeKeyVault: "deploy-time-keyvault"
+  deployTimeKeyVault: "deploy-time-kv"
