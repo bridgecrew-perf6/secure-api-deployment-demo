@@ -1,0 +1,44 @@
+parameters:
+  artifactName: "migrations-package"
+  databasename: "$(serviceAbbreviation)-$(deploymentEnvironment)-$(azureRegion)-sqldb"
+  databaseserver: "$(serviceAbbreviation)-$(deploymentEnvironment)-$(azureRegion)-sql"
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: Download pipeline artifact
+    inputs:
+      articfact: ${{parameters.artifactName}}
+      path: $(Pipeline.Workspace)
+
+  - task: AzureKeyVault@1
+    displayName: "Get secrets from deploy-time KeyVault"
+    inputs:
+      azureSubscription: DeployTimeKeyVault
+      KeyVaultName: $(deployTimeKeyVault)
+      SecretsFilter: "SqlServerPassword"
+
+  - powershell: Get-ChildItem -Path '$(Pipeline.Workspace)/${{parameters.artifactName}}' -recurse
+
+  - task: PowerShell@2
+    displayName: "Migrate database"
+    inputs:
+      targetType: "inline"
+      failOnStderr: true
+      script: |
+        Write-Host "Executing command: $(Pipeline.Workspace)/${{parameters.artifactName}}/Demo.DataMigration/Demo.DataMigration.exe migrate"
+        $(Pipeline.Workspace)/${{parameters.artifactName}}/Demo.DataMigration/Demo.DataMigration.exe migrate -n "${{lower(parameters.databasename)}}" -s "${{lower(parameters.databaseserver)}}" -u "DotNetFriday" -p "$(SqlServerPassword)"
+        if ($LASTEXITCODE -ne 0) { 
+          exit $LASTEXITCODE
+        }
+
+  - task: PowerShell@2
+    displayName: "Seed database"
+    inputs:
+      targetType: "inline"
+      failOnStderr: true
+      script: |
+        Write-Host "Executing command: $(Pipeline.Workspace)/${{parameters.artifactName}}/Demo.DataMigration/Demo.DataMigration.exe seed"
+        $(Pipeline.Workspace)/${{parameters.artifactName}}/Demo.DataMigration/Demo.DataMigration.exe seed -n "${{lower(parameters.databasename)}}" -s "${{lower(parameters.databaseserver)}}" -u "DotNetFriday" -p "$(SqlServerPassword)"
+        if ($LASTEXITCODE -ne 0) { 
+          exit $LASTEXITCODE
+        }

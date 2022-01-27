@@ -1,0 +1,19 @@
+jobs:
+  - job: build_arm_template
+    displayName: "Build ARM template"
+    steps:
+      - template: compile-bicep.yml
+
+  - job: build_service
+    displayName: "Build Service Project"
+    steps:
+      - template: compile-project.yml
+
+  - job: build_migrations_package
+    displayName: Compile database migrations
+    pool:
+      vmImage: windows-latest
+    steps:
+      - template: compile-migrations.yml
+        parameters:
+          projectName: "src/Demo.DataMigration/Demo.DataMigration.csproj"

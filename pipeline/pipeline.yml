@@ -1,0 +1,46 @@
+variables:
+  NUGET_XMLDOC_MODE: skip
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+trigger:
+  - main
+
+pool: Default
+
+stages:
+  - stage: compile
+    displayName: "Compile sources"
+    variables:
+      - template: snippets/variables.yml
+    jobs:
+      - template: snippets/compile.yml
+
+  - stage: release_test
+    displayName: "Release Test Environment"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    dependsOn:
+      - compile
+    variables:
+      - template: snippets/variables.yml
+        parameters:
+          deploymentEnvironment: "Test"
+          subscriptionId: "d8edfd3f-489d-4db6-b048-9f6647b7b8fe"
+    jobs:
+      - template: snippets/release.yml
+        parameters:
+          azureSubscription: "TestEnvironment"
+
+  - stage: release_prod
+    displayName: "Release Prod Environment"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    dependsOn:
+      - release_test
+    variables:
+      - template: snippets/variables.yml
+        parameters:
+          deploymentEnvironment: "Prod"
+          subscriptionId: "16fa3d0c-8ec3-488a-bff3-b37c932cba84"
+    jobs:
+      - template: snippets/release.yml
+        parameters:
+          azureSubscription: "ProductionEnvironment"

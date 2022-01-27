@@ -1,0 +1,33 @@
+parameters:
+  artifactName: "arm-template"
+  azureSubscription: ""
+  azureLocation: "westeurope"
+  deploymentMode: "Incremental"
+  subscriptionId: ""
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: Download pipeline artifact
+    inputs:
+      articfact: ${{parameters.artifactName}}
+      path: $(Pipeline.Workspace)
+
+  - task: AzureKeyVault@2
+    inputs:
+      azureSubscription: DeployTimeKeyVault
+      KeyVaultName: $(deployTimeKeyVault)
+      SecretsFilter: "SqlServerPassword"
+      RunAsPreJob: false
+
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: Deploy Main Template
+    inputs:
+      azureResourceManagerConnection: ${{parameters.azureSubscription}}
+      deploymentScope: "Subscription"
+      subscriptionId: "$(subscriptionId)"
+      location: ${{ parameters.azureLocation }}
+      templateLocation: "Linked artifact"
+      csmFile: $(Pipeline.Workspace)/${{parameters.artifactName}}/main.json
+      csmParametersFile: $(Pipeline.Workspace)/${{parameters.artifactName}}/main.$(deploymentEnvironment).json
+      overrideParameters: -locationAbbreviation $(azureRegion) -sqlServerPassword $(SqlServerPassword) -serviceName $(serviceAbbreviation)
+      deploymentMode: "Incremental"

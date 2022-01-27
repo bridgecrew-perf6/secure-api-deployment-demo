@@ -1,0 +1,21 @@
+parameters:
+  artifactName: "service"
+  azureSubscription: ""
+  appServiceName: "$(serviceAbbreviation)-$(deploymentEnvironment)-$(azureRegion)-app"
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: Download pipeline artifact
+    inputs:
+      articfact: ${{parameters.artifactName}}
+      path: $(Pipeline.Workspace)
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: "Azure App Service Deploy"
+    inputs:
+      azureSubscription: "${{ parameters.azureSubscription }}"
+      WebAppName: "${{ lower(parameters.appServiceName) }}"
+      ResourceGroupName: "$(resourceGroupName)"
+      appType: "web"
+      deploymentMode: "runFromPackage"
+      package: "$(Pipeline.Workspace)/${{parameters.artifactName}}/*.zip"

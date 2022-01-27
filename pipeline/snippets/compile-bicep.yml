@@ -1,0 +1,19 @@
+parameters:
+  artifactName: 'arm-template'
+
+steps:
+  - bash: az bicep build --file ./infrastructure/main.bicep
+    displayName: 'Transpile Bicep'
+  
+  - task: CopyFiles@2
+    displayName: Move ARM Template to artifact staging
+    inputs:
+      sourceFolder: ./infrastructure
+      contents: '*.json'
+      targetFolder: '$(Build.ArtifactStagingDirectory)/${{parameters.artifactName}}'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish artifact: ${{parameters.artifactName}}'
+    inputs:
+      artifactName: ${{parameters.artifactName}}
+      targetPath: '$(Build.ArtifactStagingDirectory)/${{parameters.artifactName}}'

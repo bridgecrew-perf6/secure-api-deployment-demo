@@ -1,0 +1,7 @@
+jobs:
+  - job: update_version
+    displayName: Update pipeline version
+    steps:
+    - checkout: none
+    - bash: |
+        echo "##vso[build.updatebuildnumber]$(versionNumber)"

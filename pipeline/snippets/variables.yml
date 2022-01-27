@@ -1,0 +1,14 @@
+parameters:
+  deploymentEnvironment: ""
+  subscriptionId: ""
+
+variables:
+  verbosity: "quiet"
+  serviceName: "dotnetfriday"
+  serviceAbbreviation: "dnfriday"
+  azureRegion: "Weu"
+  deploymentEnvironment: ${{ parameters.deploymentEnvironment }}
+  resourceGroupName: "$(serviceAbbreviation)-${{ parameters.deploymentEnvironment }}-$(azureRegion)"
+  subscriptionId: "${{ parameters.subscriptionId }}"
+  deployTimeSubscription: "DeployTimeKeyVault"
+  deployTimeKeyVault: "deploy-time-keyvault"

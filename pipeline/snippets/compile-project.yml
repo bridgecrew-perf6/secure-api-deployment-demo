@@ -1,0 +1,46 @@
+parameters:
+  artifactName: 'service'
+  
+steps:
+  - task: UseDotNet@2
+    inputs:
+      version: '5.0.x'
+      includePreviewVersions: false
+
+  - task: gitversion/setup@0
+    displayName: Install GitVersion
+    inputs:
+      versionSpec: '5.x'
+
+  - task: gitversion/execute@0
+    displayName: Determine Version
+    inputs:
+      useConfigFile: true
+      configFilePath: ./gitversion.yml
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore Project Packages'
+    inputs:
+      command: 'restore'
+      projects: 'src'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      commands: 'test'
+      projects: 'src'
+      arguments: '--verbosity $(verbosity) --configuration Release --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Projects'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: 'src'
+      arguments: '--configuration Release --no-restore --no-self-contained --output "$(Build.ArtifactStagingDirectory)/${{parameters.artifactName}}" --verbosity $(verbosity)'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish artifact: ${{parameters.artifactName}}'
+    inputs:
+      artifactName: ${{parameters.artifactName}}
+      targetPath: '$(Build.ArtifactStagingDirectory)/${{parameters.artifactName}}'

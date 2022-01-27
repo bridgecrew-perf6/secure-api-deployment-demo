@@ -1,0 +1,26 @@
+parameters:
+  azureSubscription: "DeploymentDemoServiceConnection"
+
+jobs:
+  - job: deploy_infra
+    displayName: Deploy infrastructure
+    steps:
+      - template: release-arm.yml
+        parameters:
+          azureSubscription: ${{parameters.azureSubscription}}
+
+  - job: deploy_service
+    dependsOn: deploy_infra
+    displayName: Deploy API
+    steps:
+      - template: release-api.yml
+        parameters:
+          azureSubscription: ${{parameters.azureSubscription}}
+
+  - job: migrate_database
+    dependsOn: deploy_infra
+    displayName: Migrate database
+    pool:
+      vmImage: windows-latest
+    steps:
+      - template: migrate-database.yml
