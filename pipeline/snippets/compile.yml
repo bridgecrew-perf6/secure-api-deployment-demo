@@ -11,8 +11,6 @@ jobs:
 
   - job: build_migrations_package
     displayName: Compile database migrations
-    pool:
-      vmImage: windows-latest
     steps:
       - template: compile-migrations.yml
         parameters:

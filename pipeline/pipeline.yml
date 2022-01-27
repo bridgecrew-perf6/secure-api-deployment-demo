@@ -5,7 +5,8 @@ variables:
 trigger:
   - main
 
-pool: Default
+pool:
+  vmImage: ubuntu-latest
 
 stages:
   - stage: compile
@@ -24,7 +25,7 @@ stages:
       - template: snippets/variables.yml
         parameters:
           deploymentEnvironment: "Test"
-          subscriptionId: "d8edfd3f-489d-4db6-b048-9f6647b7b8fe"
+          subscriptionId: "16fa3d0c-8ec3-488a-bff3-b37c932cba84"
     jobs:
       - template: snippets/release.yml
         parameters:
@@ -39,7 +40,7 @@ stages:
       - template: snippets/variables.yml
         parameters:
           deploymentEnvironment: "Prod"
-          subscriptionId: "16fa3d0c-8ec3-488a-bff3-b37c932cba84"
+          subscriptionId: "d8edfd3f-489d-4db6-b048-9f6647b7b8fe"
     jobs:
       - template: snippets/release.yml
         parameters:
