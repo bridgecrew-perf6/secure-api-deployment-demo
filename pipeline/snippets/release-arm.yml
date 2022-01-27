@@ -29,5 +29,5 @@ steps:
       templateLocation: "Linked artifact"
       csmFile: $(Pipeline.Workspace)/${{parameters.artifactName}}/main.json
       csmParametersFile: $(Pipeline.Workspace)/${{parameters.artifactName}}/main.$(deploymentEnvironment).json
-      overrideParameters: -locationAbbreviation $(azureRegion) -sqlServerPassword $(SqlServerPassword) -serviceName $(serviceAbbreviation)
+      overrideParameters: -locationAbbreviation $(azureRegion) -sqlServerPassword $(SqlServerPassword) -systemName $(serviceAbbreviation)
       deploymentMode: "Incremental"
