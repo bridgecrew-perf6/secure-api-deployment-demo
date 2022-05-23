@@ -40,6 +40,8 @@ param sqlServerDatabaseSku object = {
   capacity: 10
 }
 
+param location string = deployment().location
+
 param deployTimeKeyVaultName string = 'deploy-time-kv'
 param deployTimeResourceGroup string = 'Deploy-Time'
 
@@ -48,7 +50,7 @@ var defaultResourceName = toLower('${systemName}-${environmentName}-${locationAb
 
 resource targetResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
-  location: deployment().location
+  location: location
 }
 
 resource deployTimeKeyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {

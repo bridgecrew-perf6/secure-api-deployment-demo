@@ -3,12 +3,14 @@ param defaultResourceName string
 @secure()
 param administratorPassword string
 
+param location string = resourceGroup().location
+
 var resourceName = '${defaultResourceName}-sql'
 var administratorLogin = '${defaultResourceName}-admin'
 
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: resourceName
-  location: resourceGroup().location
+  location: location
   properties: {
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorPassword
